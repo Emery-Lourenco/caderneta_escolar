@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card no-print">
-    <h3>Consultar Caderneta Individual</h3>
+    <h3>Consultar Caderneta / Boletim</h3>
     <form method="GET" action="{{ url_for('relatorio') }}">
         <label>Selecione o Aluno:</label>
         <select name="aluno_id" onchange="this.form.submit()">
@@ -17,22 +17,49 @@
 
 {% if aluno %}
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
-            <h2>Relatório Individual da Caderneta</h2>
-            <p><strong>Aluno:</strong> {{ aluno.nome }} | <strong>Matrícula:</strong> {{ aluno.matricula }} | <strong>Turma:</strong> {{ aluno.turma }}</p>
+            <h2>Ficha do Aluno & Boletim Escolar</h2>
+            <p><strong>Nome:</strong> {{ aluno.nome }} | <strong>Matrícula:</strong> {{ aluno.matricula }} | <strong>Turma:</strong> {{ aluno.turma }}</p>
         </div>
-        <button class="no-print" style="width: auto; padding: 0.5rem 1rem;" onclick="window.print()">Imprimir Ficha</button>
+        <button class="no-print" style="width: auto; padding: 0.5rem 1.2rem;" onclick="window.print()">Imprimir Boletim</button>
     </div>
+    
     <hr>
-    <h4>Resumo Disciplinar:</h4>
+
+    <!-- SECÇÃO 1: BOLETIM PEDAGÓGICO -->
+    <h3>1. Desempenho Pedagógico (Notas & Médias)</h3>
+    <table>
+        <thead>
+            <tr><th>Disciplina</th><th>Período</th><th>Nota 1</th><th>Nota 2</th><th>Média</th><th>Situação</th></tr>
+        </thead>
+        <tbody>
+            {% for n in notas %}
+            <tr>
+                <td>{{ n.disciplina_nome }}</td>
+                <td>{{ n.trimestre }}</td>
+                <td>{{ n.nota1 }}</td>
+                <td>{{ n.nota2 }}</td>
+                <td><strong>{{ n.media }}</strong></td>
+                <td><span class="{{ 'status-aprovado' if n.situacao == 'Aprovado' else 'status-risco' }}">{{ n.situacao }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">Nenhuma avaliação lançada até ao momento.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr style="margin-top: 2rem;">
+
+    <!-- SECÇÃO 2: COMPORTAMENTO E MÉRITO -->
+    <h3>2. Conduta & Reconhecimento</h3>
     <p>
+        ⭐ Elogios Recebidos: <strong style="color: #0284c7;">{{ totais.Elogios }}</strong> | 
         Leves: <strong>{{ totais.Leve }}</strong> | 
         Médias: <strong>{{ totais.Média }}</strong> | 
-        Graves: <strong>{{ totais.Grave }}</strong>
+        Graves: <strong style="color: #ef4444;">{{ totais.Grave }}</strong>
     </p>
 
-    <h4>Histórico de Ocorrências:</h4>
     <table>
         <thead>
             <tr><th>Data</th><th>Tipo</th><th>Gravidade</th><th>Professor</th><th>Descrição</th></tr>
@@ -41,13 +68,25 @@
             {% for oc in ocorrencias %}
             <tr>
                 <td>{{ oc.data }}</td>
-                <td>{{ oc.tipo }}</td>
-                <td><span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span></td>
+                <td>
+                    {% if oc.tipo == 'Elogio / Mérito' %}
+                        <span class="badge badge-elogio">⭐ Elogio</span>
+                    {% else %}
+                        {{ oc.tipo }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if oc.gravidade == 'N/A' %}
+                        <span class="badge badge-na">—</span>
+                    {% else %}
+                        <span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span>
+                    {% endif %}
+                </td>
                 <td>{{ oc.professor_nome }}</td>
                 <td>{{ oc.descricao }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="5">Nenhum registro para este aluno. Situação regular!</td></tr>
+            <tr><td colspan="5">Sem registos disciplinares para este aluno. Situação exemplar!</td></tr>
             {% endfor %}
         </tbody>
     </table>

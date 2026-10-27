@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h3>Registar Nova Disciplina</h3>
+    <form method="POST">
+        <label>Nome da Disciplina:</label>
+        <input type="text" name="nome" placeholder="Ex: Língua Portuguesa, Matemática" required>
+
+        <label>Professor Responsável:</label>
+        <select name="professor_id" required>
+            <option value="">Selecione o professor responsável...</option>
+            {% for p in professores %}
+            <option value="{{ p.id }}">{{ p.nome }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Cadastrar Disciplina</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Quadro Curricular</h3>
+    <table>
+        <tr><th>ID</th><th>Disciplina</th><th>Professor Responsável</th></tr>
+        {% for d in disciplinas %}
+        <tr><td>{{ d.id }}</td><td>{{ d.nome }}</td><td>{{ d.professor_nome }}</td></tr>
+        {% else %}
+        <tr><td colspan="3">Nenhuma disciplina registada ainda.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

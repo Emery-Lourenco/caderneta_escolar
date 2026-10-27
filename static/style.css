@@ -1,22 +1,36 @@
 * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 body { margin: 0; background: #f4f6f8; color: #333; }
 header { background: #1e3a8a; padding: 1rem 2rem; color: #fff; }
-nav a { color: #e2e8f0; margin-right: 1.5rem; text-decoration: none; font-weight: bold; }
+nav a { color: #cbd5e1; margin-right: 1.2rem; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
 nav a:hover { color: #fff; text-decoration: underline; }
-.container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-.card { background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+.container { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+.card { background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); margin-bottom: 2rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
 table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
 th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
-th { background: #f8fafc; }
-input, select, textarea, button { width: 100%; padding: 0.5rem; margin-top: 0.25rem; margin-bottom: 1rem; border: 1px solid #cbd5e1; border-radius: 4px; }
+th { background: #f8fafc; font-size: 0.9rem; }
+
+input, select, textarea, button { width: 100%; padding: 0.55rem; margin-top: 0.25rem; margin-bottom: 0.9rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; }
 button { background: #2563eb; color: #fff; font-weight: bold; border: none; cursor: pointer; }
 button:hover { background: #1d4ed8; }
-.badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: #fff; }
+
+/* Badges */
+.badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: #fff; display: inline-block; }
 .badge-leve { background: #10b981; }
 .badge-media { background: #f59e0b; }
 .badge-grave { background: #ef4444; }
+.badge-elogio { background: #0284c7; }
+.badge-na { background: #94a3b8; }
+
+.status-aprovado { color: #15803d; font-weight: bold; }
+.status-risco { color: #b91c1c; font-weight: bold; }
+
+.hidden { display: none; }
+
 @media print {
-    header, nav, form, .no-print { display: none; }
+    header, nav, form, .no-print { display: none !important; }
     body { background: #fff; }
-    .card { box-shadow: none; border: 1px solid #ccc; }
+    .card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 1rem; }
 }

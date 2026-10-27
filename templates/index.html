@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>Painel Geral</h3>
-    <p>Bem-vindo à Caderneta Escolar Digital (v1.0).</p>
+    <h3>Painel Geral da Instituição</h3>
+    <p>Resumo operacional da Caderneta Escolar:</p>
     <ul>
-        <li><strong>Total de Alunos Matriculados:</strong> {{ resumo.total_alunos }}</li>
-        <li><strong>Professores Cadastrados:</strong> {{ resumo.total_professores }}</li>
-        <li><strong>Total de Ocorrências:</strong> {{ resumo.total_ocorrencias }}</li>
+        <li><strong>Alunos Registados:</strong> {{ resumo.total_alunos }}</li>
+        <li><strong>Corpo Docente:</strong> {{ resumo.total_professores }}</li>
+        <li><strong>Disciplinas Curriculares:</strong> {{ resumo.total_disciplinas }}</li>
+        <li><strong>Ocorrências Disciplinares/Pedagógicas:</strong> {{ resumo.total_ocorrencias }}</li>
+        <li><strong>Elogios / Méritos Concedidos:</strong> <span style="color: #0284c7; font-weight: bold;">{{ resumo.total_elogios }}</span></li>
     </ul>
 </div>
 {% endblock %}

@@ -11,6 +11,12 @@
             "nome": "João Gonga",
             "matricula": "20242332",
             "turma": "3º M1"
+        },
+        {
+            "id": 3,
+            "nome": "Mário Perreira",
+            "matricula": "20240305",
+            "turma": "3º M1"
         }
     ],
     "professores": [
@@ -45,6 +51,126 @@
             "tipo": "Disciplinar",
             "gravidade": "Grave",
             "descricao": "Lutou com o professor porque o mesmo afirmou não tinha \"Chakra\""
+        },
+        {
+            "id": 3,
+            "aluno_id": 2,
+            "professor_id": 2,
+            "data": "2026-10-28",
+            "tipo": "Elogio / Mérito",
+            "gravidade": "N/A",
+            "descricao": "Ele mudou, agora está mais calmo"
+        },
+        {
+            "id": 4,
+            "aluno_id": 1,
+            "professor_id": 2,
+            "data": "2026-10-29",
+            "tipo": "Elogio / Mérito",
+            "gravidade": "N/A",
+            "descricao": "Tem muito \"Chakra\""
+        },
+        {
+            "id": 5,
+            "aluno_id": 3,
+            "professor_id": 1,
+            "data": "2026-10-29",
+            "tipo": "Pedagógica",
+            "gravidade": "Média",
+            "descricao": "Tem faltado muito!"
+        },
+        {
+            "id": 6,
+            "aluno_id": 3,
+            "professor_id": 1,
+            "data": "2026-10-30",
+            "tipo": "Disciplinar",
+            "gravidade": "Leve",
+            "descricao": "Lutou com o colega Josenilson"
+        }
+    ],
+    "disciplinas": [
+        {
+            "id": 1,
+            "nome": "Engenharia de Software - I",
+            "professor_id": 1
+        },
+        {
+            "id": 2,
+            "nome": "Programação - III",
+            "professor_id": 2
+        }
+    ],
+    "notas": [
+        {
+            "id": 1,
+            "aluno_id": 1,
+            "disciplina_id": 1,
+            "trimestre": "1º Trimestre",
+            "nota1": 20.0,
+            "nota2": 20.0,
+            "media": 20.0,
+            "situacao": "Aprovado"
+        },
+        {
+            "id": 2,
+            "aluno_id": 2,
+            "disciplina_id": 1,
+            "trimestre": "1º Trimestre",
+            "nota1": 20.0,
+            "nota2": 6.0,
+            "media": 13.0,
+            "situacao": "Aprovado"
+        },
+        {
+            "id": 3,
+            "aluno_id": 1,
+            "disciplina_id": 2,
+            "trimestre": "1º Trimestre",
+            "nota1": 15.0,
+            "nota2": 17.0,
+            "media": 16.0,
+            "situacao": "Aprovado"
+        },
+        {
+            "id": 4,
+            "aluno_id": 2,
+            "disciplina_id": 2,
+            "trimestre": "1º Trimestre",
+            "nota1": 17.0,
+            "nota2": 10.0,
+            "media": 13.5,
+            "situacao": "Aprovado"
+        },
+        {
+            "id": 5,
+            "aluno_id": 2,
+            "disciplina_id": 1,
+            "trimestre": "1º Trimestre",
+            "nota1": 6.0,
+            "nota2": 9.0,
+            "media": 7.5,
+            "situacao": "Em Risco"
+        },
+        {
+            "id": 6,
+            "aluno_id": 3,
+            "disciplina_id": 1,
+            "trimestre": "2º Trimestre",
+            "nota1": 4.0,
+            "nota2": 8.0,
+            "media": 6.0,
+            "situacao": "Em Risco"
+        },
+        {
+            "id": 7,
+            "aluno_id": 2,
+            "disciplina_id": 1,
+            "trimestre": "1º Trimestre",
+            "nota1": 1.0,
+            "nota2": 3.0,
+            "media": 2.0,
+            "situacao": "Em Risco"
         }
     ]
 }

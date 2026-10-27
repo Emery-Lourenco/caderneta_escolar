@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>Registar Ocorrência</h3>
+    <h3>Registar Ocorrência / Elogio</h3>
     <form method="POST">
         <label>Aluno:</label>
         <select name="aluno_id" required>
@@ -15,7 +15,7 @@
         <select name="professor_id" required>
             <option value="">Selecione o professor...</option>
             {% for p in professores %}
-            <option value="{{ p.id }}">{{ p.nome }} ({{ p.disciplina }})</option>
+            <option value="{{ p.id }}">{{ p.nome }}</option>
             {% endfor %}
         </select>
 
@@ -23,41 +23,73 @@
         <input type="date" name="data">
 
         <label>Tipo:</label>
-        <select name="tipo">
+        <select name="tipo" id="tipoSelect" onchange="verificarTipo()">
             <option value="Disciplinar">Disciplinar</option>
             <option value="Pedagógica">Pedagógica</option>
-            <option value="Elogio">Elogio / Mérito</option>
+            <option value="Elogio / Mérito">Elogio / Mérito</option>
         </select>
 
-        <label>Gravidade:</label>
-        <select name="gravidade">
-            <option value="Leve">Leve</option>
-            <option value="Média">Média</option>
-            <option value="Grave">Grave</option>
-        </select>
+        <!-- Este campo oculta e desativa automaticamente quando selecionado Elogio -->
+        <div id="campoGravidade">
+            <label>Gravidade da Ocorrência:</label>
+            <select name="gravidade" id="gravidadeSelect">
+                <option value="Leve">Leve</option>
+                <option value="Média">Média</option>
+                <option value="Grave">Grave</option>
+            </select>
+        </div>
 
-        <label>Descrição do Fato:</label>
+        <label>Descrição detalhada:</label>
         <textarea name="descricao" rows="3" required></textarea>
 
-        <button type="submit">Guardar Ocorrência</button>
+        <button type="submit">Guardar Registro</button>
     </form>
 </div>
 
 <div class="card">
-    <h3>Histórico Geral de Ocorrências</h3>
+    <h3>Histórico Escolar Registado</h3>
     <table>
-        <tr><th>Data</th><th>Aluno</th><th>Professor</th><th>Gravidade</th><th>Descrição</th></tr>
+        <tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Gravidade</th><th>Professor</th><th>Descrição</th></tr>
         {% for oc in ocorrencias %}
         <tr>
             <td>{{ oc.data }}</td>
             <td>{{ oc.aluno_nome }}</td>
+            <td>
+                {% if oc.tipo == 'Elogio / Mérito' %}
+                    <span class="badge badge-elogio">⭐ Elogio</span>
+                {% else %}
+                    {{ oc.tipo }}
+                {% endif %}
+            </td>
+            <td>
+                {% if oc.gravidade == 'N/A' %}
+                    <span class="badge badge-na">—</span>
+                {% else %}
+                    <span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span>
+                {% endif %}
+            </td>
             <td>{{ oc.professor_nome }}</td>
-            <td><span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span></td>
             <td>{{ oc.descricao }}</td>
         </tr>
         {% else %}
-        <tr><td colspan="5">Nenhuma ocorrência registada.</td></tr>
+        <tr><td colspan="6">Nenhum registro encontrado.</td></tr>
         {% endfor %}
     </table>
 </div>
+
+<script>
+function verificarTipo() {
+    const tipo = document.getElementById('tipoSelect').value;
+    const campoGravidade = document.getElementById('campoGravidade');
+    const selectGravidade = document.getElementById('gravidadeSelect');
+
+    if (tipo === 'Elogio / Mérito') {
+        campoGravidade.classList.add('hidden');
+        selectGravidade.disabled = true; // Desativa para não enviar o valor
+    } else {
+        campoGravidade.classList.remove('hidden');
+        selectGravidade.disabled = false;
+    }
+}
+</script>
 {% endblock %}
