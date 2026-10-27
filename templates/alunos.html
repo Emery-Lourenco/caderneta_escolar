@@ -10,27 +10,46 @@
         <label>Nome Completo:</label>
         <input type="text" name="nome" value="{{ editando.nome if editando else '' }}" required>
         
-        <label>Matrícula:</label>
-        <input type="text" name="matricula" value="{{ editando.matricula if editando else '' }}" required>
+        <div class="grid-2">
+            <div>
+                <label>Matrícula:</label>
+                <input type="text" name="matricula" value="{{ editando.matricula if editando else '' }}" required>
+            </div>
+            <div>
+                <label>Turma:</label>
+                <input type="text" name="turma" value="{{ editando.turma if editando else '' }}" required placeholder="Ex: 9º Ano A">
+            </div>
+        </div>
         
-        <label>Turma:</label>
-        <input type="text" name="turma" value="{{ editando.turma if editando else '' }}" required placeholder="Ex: 9º Ano A">
-        
-        <button type="submit">{{ 'Atualizar Aluno' if editando else 'Cadastrar Aluno' }}</button>
-        {% if editando %}
-        <a href="{{ url_for('alunos') }}" class="btn-cancel">Cancelar Edição</a>
-        {% endif %}
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">{{ 'Atualizar Aluno' if editando else 'Cadastrar Aluno' }}</button>
+            {% if editando %}
+            <a href="{{ url_for('alunos') }}" class="btn-cancel">Cancelar Edição</a>
+            {% endif %}
+        </div>
     </form>
 </div>
+
 <div class="card">
-    <h3>Lista de Alunos</h3>
+    <div class="table-header-bar">
+        <h3>Lista de Estudantes</h3>
+        <form method="GET" class="sort-box">
+            <label for="ordem">Ordenar por:</label>
+            <select name="ordem" id="ordem" onchange="this.form.submit()">
+                <option value="nome_asc" {% if ordem_atual == 'nome_asc' %}selected{% endif %}>Nome (A-Z)</option>
+                <option value="nome_desc" {% if ordem_atual == 'nome_desc' %}selected{% endif %}>Nome (Z-A)</option>
+                <option value="turma" {% if ordem_atual == 'turma' %}selected{% endif %}>Turma</option>
+                <option value="matricula" {% if ordem_atual == 'matricula' %}selected{% endif %}>Nº Matrícula</option>
+            </select>
+        </form>
+    </div>
     <table>
         <tr>
             <th>ID</th>
             <th>Nome</th>
             <th>Matrícula</th>
             <th>Turma</th>
-            <th class="no-print">Ações</th>
+            <th class="no-print" style="width: 140px;">Ações</th>
         </tr>
         {% for a in alunos %}
         <tr>
@@ -39,8 +58,10 @@
             <td>{{ a.matricula }}</td>
             <td>{{ a.turma }}</td>
             <td class="no-print">
-                <a href="{{ url_for('alunos', editar_id=a.id) }}" class="btn-action btn-edit">Editar</a>
-                <a href="{{ url_for('alunos_eliminar', id=a.id) }}" class="btn-action btn-delete" onclick="return confirm('Tem certeza que deseja eliminar?')">Eliminar</a>
+                <div class="actions-cell">
+                    <a href="{{ url_for('alunos', editar_id=a.id) }}" class="btn-action btn-edit">Editar</a>
+                    <a href="{{ url_for('alunos_eliminar', id=a.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar aluno?')">Eliminar</a>
+                </div>
             </td>
         </tr>
         {% else %}

@@ -2,22 +2,26 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Caderneta Escolar v3.0</title>
+    <title>Caderneta Escolar Digital v4.0</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
-        <h2>Caderneta Escolar Digital <small style="font-size: 0.8rem; background: #2563eb; padding: 2px 6px; border-radius: 4px;">v3.0</small></h2>
-        <nav class="no-print">
-            <a href="{{ url_for('index') }}">Início</a>
-            <a href="{{ url_for('alunos') }}">Alunos</a>
-            <a href="{{ url_for('professores') }}">Professores</a>
-            <a href="{{ url_for('disciplinas') }}">Disciplinas</a>
-            <a href="{{ url_for('notas') }}">Lançar Notas</a>
-            <a href="{{ url_for('frequencias') }}">Faltas / Presença</a>
-            <a href="{{ url_for('ocorrencias') }}">Ocorrências</a>
-            <a href="{{ url_for('relatorio') }}">Boletim Escolar</a>
-        </nav>
+        <div class="header-container">
+            <h2 class="header-title">
+                Caderneta Escolar <span class="header-badge">v4.0</span>
+            </h2>
+            <nav class="no-print">
+                <a href="{{ url_for('index') }}" class="nav-link {{ 'active' if request.endpoint == 'index' else '' }}">Início</a>
+                <a href="{{ url_for('alunos') }}" class="nav-link {{ 'active' if request.endpoint == 'alunos' else '' }}">Alunos</a>
+                <a href="{{ url_for('professores') }}" class="nav-link {{ 'active' if request.endpoint == 'professores' else '' }}">Professores</a>
+                <a href="{{ url_for('disciplinas') }}" class="nav-link {{ 'active' if request.endpoint == 'disciplinas' else '' }}">Disciplinas</a>
+                <a href="{{ url_for('notas') }}" class="nav-link {{ 'active' if request.endpoint == 'notas' else '' }}">Notas</a>
+                <a href="{{ url_for('frequencias') }}" class="nav-link {{ 'active' if request.endpoint == 'frequencias' else '' }}">Faltas</a>
+                <a href="{{ url_for('ocorrencias') }}" class="nav-link {{ 'active' if request.endpoint == 'ocorrencias' else '' }}">Ocorrências</a>
+                <a href="{{ url_for('relatorio') }}" class="nav-link {{ 'active' if request.endpoint == 'relatorio' else '' }}">Boletim Escolar</a>
+            </nav>
+        </div>
     </header>
     <div class="container">
         {% block content %}{% endblock %}

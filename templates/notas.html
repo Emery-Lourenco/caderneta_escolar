@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>{{ 'Editar Avaliação' if editando else 'Lançar / Atualizar Avaliações' }}</h3>
+    <h3>{{ 'Editar Avaliação' if editando else 'Lançar Avaliações' }}</h3>
     <form method="POST">
         {% if editando %}
         <input type="hidden" name="id" value="{{ editando.id }}">
@@ -50,15 +50,30 @@
             </div>
         </div>
 
-        <button type="submit">{{ 'Atualizar Nota' if editando else 'Salvar Avaliação (Atualiza se já existir)' }}</button>
-        {% if editando %}
-        <a href="{{ url_for('notas') }}" class="btn-cancel">Cancelar Edição</a>
-        {% endif %}
+        <div class="form-actions">
+            <!-- Pedido atendido: texto exato "Salvar Avaliação" -->
+            <button type="submit" class="btn-primary">Salvar Avaliação</button>
+            {% if editando %}
+            <a href="{{ url_for('notas') }}" class="btn-cancel">Cancelar Edição</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 
 <div class="card">
-    <h3>Pauta de Notas Lançadas</h3>
+    <div class="table-header-bar">
+        <h3>Pauta Geral de Avaliações</h3>
+        <form method="GET" class="sort-box">
+            <label for="ordem">Ordenar por:</label>
+            <select name="ordem" id="ordem" onchange="this.form.submit()">
+                <option value="aluno" {% if ordem_atual == 'aluno' %}selected{% endif %}>Aluno (A-Z)</option>
+                <option value="disciplina" {% if ordem_atual == 'disciplina' %}selected{% endif %}>Disciplina</option>
+                <option value="media_desc" {% if ordem_atual == 'media_desc' %}selected{% endif %}>Maior Média</option>
+                <option value="media_asc" {% if ordem_atual == 'media_asc' %}selected{% endif %}>Menor Média</option>
+                <option value="trimestre" {% if ordem_atual == 'trimestre' %}selected{% endif %}>Trimestre</option>
+            </select>
+        </form>
+    </div>
     <table>
         <tr>
             <th>Aluno</th>
@@ -68,7 +83,7 @@
             <th>Nota 2</th>
             <th>Média</th>
             <th>Situação</th>
-            <th class="no-print">Ações</th>
+            <th class="no-print" style="width: 140px;">Ações</th>
         </tr>
         {% for n in notas %}
         <tr>
@@ -84,12 +99,14 @@
                 </span>
             </td>
             <td class="no-print">
-                <a href="{{ url_for('notas', editar_id=n.id) }}" class="btn-action btn-edit">Editar</a>
-                <a href="{{ url_for('notas_eliminar', id=n.id) }}" class="btn-action btn-delete" onclick="return confirm('Excluir esta nota?')">Eliminar</a>
+                <div class="actions-cell">
+                    <a href="{{ url_for('notas', editar_id=n.id) }}" class="btn-action btn-edit">Editar</a>
+                    <a href="{{ url_for('notas_eliminar', id=n.id) }}" class="btn-action btn-delete" onclick="return confirm('Excluir esta nota?')">Eliminar</a>
+                </div>
             </td>
         </tr>
         {% else %}
-        <tr><td colspan="8">Nenhuma nota lançada.</td></tr>
+        <tr><td colspan="8">Nenhuma avaliação registada.</td></tr>
         {% endfor %}
     </table>
 </div>

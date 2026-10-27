@@ -1,31 +1,67 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>Registar Nova Disciplina</h3>
+    <h3>{{ 'Editar Disciplina' if editando else 'Registar Nova Disciplina' }}</h3>
     <form method="POST">
+        {% if editando %}
+        <input type="hidden" name="id" value="{{ editando.id }}">
+        {% endif %}
+
         <label>Nome da Disciplina:</label>
-        <input type="text" name="nome" placeholder="Ex: Língua Portuguesa, Matemática" required>
+        <input type="text" name="nome" value="{{ editando.nome if editando else '' }}" placeholder="Ex: Matemática, Física" required>
 
         <label>Professor Responsável:</label>
         <select name="professor_id" required>
-            <option value="">Selecione o professor responsável...</option>
+            <option value="">Selecione o professor...</option>
             {% for p in professores %}
-            <option value="{{ p.id }}">{{ p.nome }}</option>
+            <option value="{{ p.id }}" {% if editando and editando.professor_id == p.id %}selected{% endif %}>
+                {{ p.nome }}
+            </option>
             {% endfor %}
         </select>
 
-        <button type="submit">Cadastrar Disciplina</button>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">{{ 'Atualizar Disciplina' if editando else 'Cadastrar Disciplina' }}</button>
+            {% if editando %}
+            <a href="{{ url_for('disciplinas') }}" class="btn-cancel">Cancelar Edição</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 
 <div class="card">
-    <h3>Quadro Curricular</h3>
+    <div class="table-header-bar">
+        <h3>Quadro Curricular</h3>
+        <form method="GET" class="sort-box">
+            <label for="ordem">Ordenar por:</label>
+            <select name="ordem" id="ordem" onchange="this.form.submit()">
+                <option value="nome_asc" {% if ordem_atual == 'nome_asc' %}selected{% endif %}>Disciplina (A-Z)</option>
+                <option value="nome_desc" {% if ordem_atual == 'nome_desc' %}selected{% endif %}>Disciplina (Z-A)</option>
+                <option value="professor" {% if ordem_atual == 'professor' %}selected{% endif %}>Professor Responsável</option>
+            </select>
+        </form>
+    </div>
     <table>
-        <tr><th>ID</th><th>Disciplina</th><th>Professor Responsável</th></tr>
+        <tr>
+            <th>ID</th>
+            <th>Disciplina</th>
+            <th>Professor Responsável</th>
+            <th class="no-print" style="width: 140px;">Ações</th>
+        </tr>
         {% for d in disciplinas %}
-        <tr><td>{{ d.id }}</td><td>{{ d.nome }}</td><td>{{ d.professor_nome }}</td></tr>
+        <tr>
+            <td>{{ d.id }}</td>
+            <td>{{ d.nome }}</td>
+            <td>{{ d.professor_nome }}</td>
+            <td class="no-print">
+                <div class="actions-cell">
+                    <a href="{{ url_for('disciplinas', editar_id=d.id) }}" class="btn-action btn-edit">Editar</a>
+                    <a href="{{ url_for('disciplinas_eliminar', id=d.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar disciplina?')">Eliminar</a>
+                </div>
+            </td>
+        </tr>
         {% else %}
-        <tr><td colspan="3">Nenhuma disciplina registada ainda.</td></tr>
+        <tr><td colspan="4">Nenhuma disciplina cadastrada.</td></tr>
         {% endfor %}
     </table>
 </div>

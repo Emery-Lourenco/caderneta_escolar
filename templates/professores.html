@@ -1,23 +1,58 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>Novo Professor</h3>
+    <h3>{{ 'Editar Professor' if editando else 'Novo Professor' }}</h3>
     <form method="POST">
-        <label>Nome:</label>
-        <input type="text" name="nome" required>
-        <label>Disciplina:</label>
-        <input type="text" name="disciplina" required placeholder="Ex: Matemática">
-        <label>Email:</label>
-        <input type="email" name="email" required>
-        <button type="submit">Cadastrar Professor</button>
+        {% if editando %}
+        <input type="hidden" name="id" value="{{ editando.id }}">
+        {% endif %}
+
+        <label>Nome Completo:</label>
+        <input type="text" name="nome" value="{{ editando.nome if editando else '' }}" required>
+
+        <label>Email de Contato:</label>
+        <input type="email" name="email" value="{{ editando.email if editando else '' }}" required>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">{{ 'Atualizar Professor' if editando else 'Cadastrar Professor' }}</button>
+            {% if editando %}
+            <a href="{{ url_for('professores') }}" class="btn-cancel">Cancelar Edição</a>
+            {% endif %}
+        </div>
     </form>
 </div>
+
 <div class="card">
-    <h3>Professores Registados</h3>
+    <div class="table-header-bar">
+        <h3>Corpo Docente Registado</h3>
+        <form method="GET" class="sort-box">
+            <label for="ordem">Ordenar por:</label>
+            <select name="ordem" id="ordem" onchange="this.form.submit()">
+                <option value="nome_asc" {% if ordem_atual == 'nome_asc' %}selected{% endif %}>Nome (A-Z)</option>
+                <option value="nome_desc" {% if ordem_atual == 'nome_desc' %}selected{% endif %}>Nome (Z-A)</option>
+                <option value="email" {% if ordem_atual == 'email' %}selected{% endif %}>Email</option>
+            </select>
+        </form>
+    </div>
     <table>
-        <tr><th>ID</th><th>Nome</th><th>Disciplina</th><th>Email</th></tr>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th class="no-print" style="width: 140px;">Ações</th>
+        </tr>
         {% for p in professores %}
-        <tr><td>{{ p.id }}</td><td>{{ p.nome }}</td><td>{{ p.disciplina }}</td><td>{{ p.email }}</td></tr>
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.nome }}</td>
+            <td>{{ p.email }}</td>
+            <td class="no-print">
+                <div class="actions-cell">
+                    <a href="{{ url_for('professores', editar_id=p.id) }}" class="btn-action btn-edit">Editar</a>
+                    <a href="{{ url_for('professores_eliminar', id=p.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar este professor?')">Eliminar</a>
+                </div>
+            </td>
+        </tr>
         {% else %}
         <tr><td colspan="4">Nenhum professor registado.</td></tr>
         {% endfor %}
