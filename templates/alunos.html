@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h3>Novo Aluno</h3>
+    <form method="POST">
+        <label>Nome Completo:</label>
+        <input type="text" name="nome" required>
+        <label>Matrícula:</label>
+        <input type="text" name="matricula" required>
+        <label>Turma:</label>
+        <input type="text" name="turma" required placeholder="Ex: 9º Ano A">
+        <button type="submit">Cadastrar Aluno</button>
+    </form>
+</div>
+<div class="card">
+    <h3>Lista de Alunos</h3>
+    <table>
+        <tr><th>ID</th><th>Nome</th><th>Matrícula</th><th>Turma</th></tr>
+        {% for a in alunos %}
+        <tr><td>{{ a.id }}</td><td>{{ a.nome }}</td><td>{{ a.matricula }}</td><td>{{ a.turma }}</td></tr>
+        {% else %}
+        <tr><td colspan="4">Nenhum aluno registado.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

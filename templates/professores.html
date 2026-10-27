@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h3>Novo Professor</h3>
+    <form method="POST">
+        <label>Nome:</label>
+        <input type="text" name="nome" required>
+        <label>Disciplina:</label>
+        <input type="text" name="disciplina" required placeholder="Ex: Matemática">
+        <label>Email:</label>
+        <input type="email" name="email" required>
+        <button type="submit">Cadastrar Professor</button>
+    </form>
+</div>
+<div class="card">
+    <h3>Professores Registados</h3>
+    <table>
+        <tr><th>ID</th><th>Nome</th><th>Disciplina</th><th>Email</th></tr>
+        {% for p in professores %}
+        <tr><td>{{ p.id }}</td><td>{{ p.nome }}</td><td>{{ p.disciplina }}</td><td>{{ p.email }}</td></tr>
+        {% else %}
+        <tr><td colspan="4">Nenhum professor registado.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

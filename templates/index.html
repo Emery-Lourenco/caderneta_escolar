@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h3>Painel Geral</h3>
+    <p>Bem-vindo à Caderneta Escolar Digital (v1.0).</p>
+    <ul>
+        <li><strong>Total de Alunos Matriculados:</strong> {{ resumo.total_alunos }}</li>
+        <li><strong>Professores Cadastrados:</strong> {{ resumo.total_professores }}</li>
+        <li><strong>Total de Ocorrências:</strong> {{ resumo.total_ocorrencias }}</li>
+    </ul>
+</div>
+{% endblock %}

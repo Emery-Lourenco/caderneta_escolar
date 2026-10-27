@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card no-print">
+    <h3>Consultar Caderneta Individual</h3>
+    <form method="GET" action="{{ url_for('relatorio') }}">
+        <label>Selecione o Aluno:</label>
+        <select name="aluno_id" onchange="this.form.submit()">
+            <option value="">-- Escolha um aluno --</option>
+            {% for a in alunos %}
+            <option value="{{ a.id }}" {% if aluno and aluno.id == a.id %}selected{% endif %}>
+                {{ a.nome }} - {{ a.turma }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if aluno %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>Relatório Individual da Caderneta</h2>
+            <p><strong>Aluno:</strong> {{ aluno.nome }} | <strong>Matrícula:</strong> {{ aluno.matricula }} | <strong>Turma:</strong> {{ aluno.turma }}</p>
+        </div>
+        <button class="no-print" style="width: auto; padding: 0.5rem 1rem;" onclick="window.print()">Imprimir Ficha</button>
+    </div>
+    <hr>
+    <h4>Resumo Disciplinar:</h4>
+    <p>
+        Leves: <strong>{{ totais.Leve }}</strong> | 
+        Médias: <strong>{{ totais.Média }}</strong> | 
+        Graves: <strong>{{ totais.Grave }}</strong>
+    </p>
+
+    <h4>Histórico de Ocorrências:</h4>
+    <table>
+        <thead>
+            <tr><th>Data</th><th>Tipo</th><th>Gravidade</th><th>Professor</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+            {% for oc in ocorrencias %}
+            <tr>
+                <td>{{ oc.data }}</td>
+                <td>{{ oc.tipo }}</td>
+                <td><span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span></td>
+                <td>{{ oc.professor_nome }}</td>
+                <td>{{ oc.descricao }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">Nenhum registro para este aluno. Situação regular!</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

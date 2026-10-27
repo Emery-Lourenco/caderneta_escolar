@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h3>Registar Ocorrência</h3>
+    <form method="POST">
+        <label>Aluno:</label>
+        <select name="aluno_id" required>
+            <option value="">Selecione um aluno...</option>
+            {% for a in alunos %}
+            <option value="{{ a.id }}">{{ a.nome }} ({{ a.turma }})</option>
+            {% endfor %}
+        </select>
+        
+        <label>Professor Relator:</label>
+        <select name="professor_id" required>
+            <option value="">Selecione o professor...</option>
+            {% for p in professores %}
+            <option value="{{ p.id }}">{{ p.nome }} ({{ p.disciplina }})</option>
+            {% endfor %}
+        </select>
+
+        <label>Data:</label>
+        <input type="date" name="data">
+
+        <label>Tipo:</label>
+        <select name="tipo">
+            <option value="Disciplinar">Disciplinar</option>
+            <option value="Pedagógica">Pedagógica</option>
+            <option value="Elogio">Elogio / Mérito</option>
+        </select>
+
+        <label>Gravidade:</label>
+        <select name="gravidade">
+            <option value="Leve">Leve</option>
+            <option value="Média">Média</option>
+            <option value="Grave">Grave</option>
+        </select>
+
+        <label>Descrição do Fato:</label>
+        <textarea name="descricao" rows="3" required></textarea>
+
+        <button type="submit">Guardar Ocorrência</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Histórico Geral de Ocorrências</h3>
+    <table>
+        <tr><th>Data</th><th>Aluno</th><th>Professor</th><th>Gravidade</th><th>Descrição</th></tr>
+        {% for oc in ocorrencias %}
+        <tr>
+            <td>{{ oc.data }}</td>
+            <td>{{ oc.aluno_nome }}</td>
+            <td>{{ oc.professor_nome }}</td>
+            <td><span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span></td>
+            <td>{{ oc.descricao }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">Nenhuma ocorrência registada.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{
+    "alunos": [
+        {
+            "id": 1,
+            "nome": "Emerson Lourenço",
+            "matricula": "20240183",
+            "turma": "3º M1"
+        },
+        {
+            "id": 2,
+            "nome": "João Gonga",
+            "matricula": "20242332",
+            "turma": "3º M1"
+        }
+    ],
+    "professores": [
+        {
+            "id": 1,
+            "nome": "Judson Paiva",
+            "disciplina": "Engenharia de Software - I",
+            "email": "judson@gmail.com"
+        },
+        {
+            "id": 2,
+            "nome": "Sediangani Sofrimento",
+            "disciplina": "Programação - III",
+            "email": "sediangani@gmail.com"
+        }
+    ],
+    "ocorrencias": [
+        {
+            "id": 1,
+            "aluno_id": 1,
+            "professor_id": 1,
+            "data": "2026-10-27",
+            "tipo": "Elogio",
+            "gravidade": "Leve",
+            "descricao": "Bom aluno, sempre atento e trabalhar!"
+        },
+        {
+            "id": 2,
+            "aluno_id": 2,
+            "professor_id": 2,
+            "data": "2026-10-27",
+            "tipo": "Disciplinar",
+            "gravidade": "Grave",
+            "descricao": "Lutou com o professor porque o mesmo afirmou não tinha \"Chakra\""
+        }
+    ]
+}

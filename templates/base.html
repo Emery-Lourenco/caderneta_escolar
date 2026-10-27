@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Caderneta Escolar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h2>Caderneta Escolar Digital</h2>
+        <nav class="no-print">
+            <a href="{{ url_for('index') }}">Início</a>
+            <a href="{{ url_for('alunos') }}">Alunos</a>
+            <a href="{{ url_for('professores') }}">Professores</a>
+            <a href="{{ url_for('ocorrencias') }}">Ocorrências</a>
+            <a href="{{ url_for('relatorio') }}">Relatório da Caderneta</a>
+        </nav>
+    </header>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
