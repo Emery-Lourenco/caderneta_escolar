@@ -24,13 +24,18 @@
             "id": 1,
             "nome": "Judson Paiva",
             "disciplina": "Engenharia de Software - I",
-            "email": "judson@gmail.com"
+            "email": "judson.paiva@isptec.co.ao"
         },
         {
             "id": 2,
             "nome": "Sediangani Sofrimento",
             "disciplina": "Programação - III",
             "email": "sediangani@gmail.com"
+        },
+        {
+            "id": 3,
+            "nome": "Valeriano Messele",
+            "email": "valeriano@isptec.co.ao"
         }
     ],
     "ocorrencias": [
@@ -39,9 +44,9 @@
             "aluno_id": 1,
             "professor_id": 1,
             "data": "2026-10-27",
-            "tipo": "Elogio",
-            "gravidade": "Leve",
-            "descricao": "Bom aluno, sempre atento e trabalhar!"
+            "tipo": "Elogio / Mérito",
+            "gravidade": "N/A",
+            "descricao": "Bom aluno, sempre atento e trabalhar, terá um bom futuro!"
         },
         {
             "id": 2,
@@ -99,6 +104,11 @@
             "id": 2,
             "nome": "Programação - III",
             "professor_id": 2
+        },
+        {
+            "id": 3,
+            "nome": "Sistemas Operativos",
+            "professor_id": 3
         }
     ],
     "notas": [
@@ -117,10 +127,10 @@
             "aluno_id": 2,
             "disciplina_id": 1,
             "trimestre": "1º Trimestre",
-            "nota1": 20.0,
-            "nota2": 6.0,
-            "media": 13.0,
-            "situacao": "Aprovado"
+            "nota1": 1.0,
+            "nota2": 2.0,
+            "media": 1.5,
+            "situacao": "Em Risco"
         },
         {
             "id": 3,
@@ -144,33 +154,71 @@
         },
         {
             "id": 5,
-            "aluno_id": 2,
-            "disciplina_id": 1,
+            "aluno_id": 1,
+            "disciplina_id": 3,
             "trimestre": "1º Trimestre",
-            "nota1": 6.0,
-            "nota2": 9.0,
-            "media": 7.5,
-            "situacao": "Em Risco"
+            "nota1": 18.0,
+            "nota2": 15.0,
+            "media": 16.5,
+            "situacao": "Aprovado"
         },
         {
             "id": 6,
-            "aluno_id": 3,
+            "aluno_id": 1,
             "disciplina_id": 1,
             "trimestre": "2º Trimestre",
-            "nota1": 4.0,
-            "nota2": 8.0,
-            "media": 6.0,
-            "situacao": "Em Risco"
+            "nota1": 16.0,
+            "nota2": 19.0,
+            "media": 17.5,
+            "situacao": "Aprovado"
         },
         {
             "id": 7,
             "aluno_id": 2,
             "disciplina_id": 1,
+            "trimestre": "2º Trimestre",
+            "nota1": 13.0,
+            "nota2": 16.0,
+            "media": 14.5,
+            "situacao": "Aprovado"
+        },
+        {
+            "id": 8,
+            "aluno_id": 3,
+            "disciplina_id": 1,
             "trimestre": "1º Trimestre",
-            "nota1": 1.0,
-            "nota2": 3.0,
-            "media": 2.0,
+            "nota1": 4.0,
+            "nota2": 7.0,
+            "media": 5.5,
             "situacao": "Em Risco"
+        },
+        {
+            "id": 9,
+            "aluno_id": 3,
+            "disciplina_id": 1,
+            "trimestre": "2º Trimestre",
+            "nota1": 16.0,
+            "nota2": 7.0,
+            "media": 11.5,
+            "situacao": "Aprovado"
+        }
+    ],
+    "frequencias": [
+        {
+            "id": 1,
+            "aluno_id": 3,
+            "disciplina_id": 1,
+            "data": "2026-10-29",
+            "tipo": "Injustificada",
+            "justificativa": "Não quis aparecer"
+        },
+        {
+            "id": 2,
+            "aluno_id": 1,
+            "disciplina_id": 2,
+            "data": "2026-10-16",
+            "tipo": "Justificada",
+            "justificativa": "Estava doente!"
         }
     ]
 }
