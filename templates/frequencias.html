@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h3>{{ 'Editar Falta' if editando else 'Lançar Falta / Ausência' }}</h3>
+    <form method="POST">
+        {% if editando %}
+        <input type="hidden" name="id" value="{{ editando.id }}">
+        {% endif %}
+
+        <div class="grid-2">
+            <div>
+                <label>Aluno:</label>
+                <select name="aluno_id" required>
+                    <option value="">Selecione o aluno...</option>
+                    {% for a in alunos %}
+                    <option value="{{ a.id }}" {% if editando and editando.aluno_id == a.id %}selected{% endif %}>
+                        {{ a.nome }} ({{ a.turma }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Disciplina:</label>
+                <select name="disciplina_id" required>
+                    <option value="">Selecione a disciplina...</option>
+                    {% for d in disciplinas %}
+                    <option value="{{ d.id }}" {% if editando and editando.disciplina_id == d.id %}selected{% endif %}>
+                        {{ d.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <label>Data:</label>
+                <input type="date" name="data" value="{{ editando.data if editando else '' }}" required>
+            </div>
+            <div>
+                <label>Tipo de Falta:</label>
+                <select name="tipo">
+                    <option value="Injustificada" {% if editando and editando.tipo == 'Injustificada' %}selected{% endif %}>Injustificada</option>
+                    <option value="Justificada" {% if editando and editando.tipo == 'Justificada' %}selected{% endif %}>Justificada</option>
+                </select>
+            </div>
+        </div>
+
+        <label>Justificativa / Observação:</label>
+        <input type="text" name="justificativa" value="{{ editando.justificativa if editando else '' }}" placeholder="Ex: Atestado médico, assunto familiar">
+
+        <button type="submit">{{ 'Atualizar Registro' if editando else 'Salvar Falta' }}</button>
+        {% if editando %}
+        <a href="{{ url_for('frequencias') }}" class="btn-cancel">Cancelar Edição</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="card">
+    <h3>Histórico Geral de Faltas</h3>
+    <table>
+        <tr>
+            <th>Data</th>
+            <th>Aluno</th>
+            <th>Disciplina</th>
+            <th>Tipo</th>
+            <th>Justificativa</th>
+            <th class="no-print">Ações</th>
+        </tr>
+        {% for f in frequencias %}
+        <tr>
+            <td>{{ f.data }}</td>
+            <td>{{ f.aluno_nome }}</td>
+            <td>{{ f.disciplina_nome }}</td>
+            <td>
+                <span class="badge {{ 'badge-falta-justificada' if f.tipo == 'Justificada' else 'badge-falta-injustificada' }}">
+                    {{ f.tipo }}
+                </span>
+            </td>
+            <td>{{ f.justificativa or '—' }}</td>
+            <td class="no-print">
+                <a href="{{ url_for('frequencias', editar_id=f.id) }}" class="btn-action btn-edit">Editar</a>
+                <a href="{{ url_for('frequencias_eliminar', id=f.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar registro de falta?')">Eliminar</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">Nenhuma falta registada.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

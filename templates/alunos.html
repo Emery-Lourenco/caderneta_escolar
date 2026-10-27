@@ -1,25 +1,50 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>Novo Aluno</h3>
+    <h3>{{ 'Editar Aluno' if editando else 'Novo Aluno' }}</h3>
     <form method="POST">
+        {% if editando %}
+        <input type="hidden" name="id" value="{{ editando.id }}">
+        {% endif %}
+
         <label>Nome Completo:</label>
-        <input type="text" name="nome" required>
+        <input type="text" name="nome" value="{{ editando.nome if editando else '' }}" required>
+        
         <label>Matrícula:</label>
-        <input type="text" name="matricula" required>
+        <input type="text" name="matricula" value="{{ editando.matricula if editando else '' }}" required>
+        
         <label>Turma:</label>
-        <input type="text" name="turma" required placeholder="Ex: 9º Ano A">
-        <button type="submit">Cadastrar Aluno</button>
+        <input type="text" name="turma" value="{{ editando.turma if editando else '' }}" required placeholder="Ex: 9º Ano A">
+        
+        <button type="submit">{{ 'Atualizar Aluno' if editando else 'Cadastrar Aluno' }}</button>
+        {% if editando %}
+        <a href="{{ url_for('alunos') }}" class="btn-cancel">Cancelar Edição</a>
+        {% endif %}
     </form>
 </div>
 <div class="card">
     <h3>Lista de Alunos</h3>
     <table>
-        <tr><th>ID</th><th>Nome</th><th>Matrícula</th><th>Turma</th></tr>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Matrícula</th>
+            <th>Turma</th>
+            <th class="no-print">Ações</th>
+        </tr>
         {% for a in alunos %}
-        <tr><td>{{ a.id }}</td><td>{{ a.nome }}</td><td>{{ a.matricula }}</td><td>{{ a.turma }}</td></tr>
+        <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.nome }}</td>
+            <td>{{ a.matricula }}</td>
+            <td>{{ a.turma }}</td>
+            <td class="no-print">
+                <a href="{{ url_for('alunos', editar_id=a.id) }}" class="btn-action btn-edit">Editar</a>
+                <a href="{{ url_for('alunos_eliminar', id=a.id) }}" class="btn-action btn-delete" onclick="return confirm('Tem certeza que deseja eliminar?')">Eliminar</a>
+            </td>
+        </tr>
         {% else %}
-        <tr><td colspan="4">Nenhum aluno registado.</td></tr>
+        <tr><td colspan="5">Nenhum aluno registado.</td></tr>
         {% endfor %}
     </table>
 </div>

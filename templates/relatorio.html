@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card no-print">
-    <h3>Consultar Caderneta / Boletim</h3>
+    <h3>Consultar Boletim da Caderneta</h3>
     <form method="GET" action="{{ url_for('relatorio') }}">
         <label>Selecione o Aluno:</label>
         <select name="aluno_id" onchange="this.form.submit()">
@@ -19,7 +19,7 @@
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
-            <h2>Ficha do Aluno & Boletim Escolar</h2>
+            <h2>Boletim Escolar & Caderneta do Aluno</h2>
             <p><strong>Nome:</strong> {{ aluno.nome }} | <strong>Matrícula:</strong> {{ aluno.matricula }} | <strong>Turma:</strong> {{ aluno.turma }}</p>
         </div>
         <button class="no-print" style="width: auto; padding: 0.5rem 1.2rem;" onclick="window.print()">Imprimir Boletim</button>
@@ -27,8 +27,8 @@
     
     <hr>
 
-    <!-- SECÇÃO 1: BOLETIM PEDAGÓGICO -->
-    <h3>1. Desempenho Pedagógico (Notas & Médias)</h3>
+    <!-- SECÇÃO 1: NOTAS -->
+    <h3>1. Rendimento Pedagógico (Notas & Médias)</h3>
     <table>
         <thead>
             <tr><th>Disciplina</th><th>Período</th><th>Nota 1</th><th>Nota 2</th><th>Média</th><th>Situação</th></tr>
@@ -44,15 +44,46 @@
                 <td><span class="{{ 'status-aprovado' if n.situacao == 'Aprovado' else 'status-risco' }}">{{ n.situacao }}</span></td>
             </tr>
             {% else %}
-            <tr><td colspan="6">Nenhuma avaliação lançada até ao momento.</td></tr>
+            <tr><td colspan="6">Nenhuma avaliação lançada.</td></tr>
             {% endfor %}
         </tbody>
     </table>
 
     <hr style="margin-top: 2rem;">
 
-    <!-- SECÇÃO 2: COMPORTAMENTO E MÉRITO -->
-    <h3>2. Conduta & Reconhecimento</h3>
+    <!-- SECÇÃO 2: FALTAS -->
+    <h3>2. Assiduidade & Frequência Escolar</h3>
+    <p>
+        Total de Faltas: <strong>{{ totais_faltas.Total }}</strong> | 
+        Justificadas: <strong style="color: #2563eb;">{{ totais_faltas.Justificada }}</strong> | 
+        Injustificadas: <strong style="color: #dc2626;">{{ totais_faltas.Injustificada }}</strong>
+    </p>
+    <table>
+        <thead>
+            <tr><th>Data</th><th>Disciplina</th><th>Tipo</th><th>Motivo / Justificativa</th></tr>
+        </thead>
+        <tbody>
+            {% for f in faltas %}
+            <tr>
+                <td>{{ f.data }}</td>
+                <td>{{ f.disciplina_nome }}</td>
+                <td>
+                    <span class="badge {{ 'badge-falta-justificada' if f.tipo == 'Justificada' else 'badge-falta-injustificada' }}">
+                        {{ f.tipo }}
+                    </span>
+                </td>
+                <td>{{ f.justificativa or 'Sem justificativa apresentada' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Assiduidade 100%! Nenhuma falta registada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr style="margin-top: 2rem;">
+
+    <!-- SECÇÃO 3: OCORRÊNCIAS -->
+    <h3>3. Conduta, Disciplina & Elogios</h3>
     <p>
         ⭐ Elogios Recebidos: <strong style="color: #0284c7;">{{ totais.Elogios }}</strong> | 
         Leves: <strong>{{ totais.Leve }}</strong> | 
@@ -78,6 +109,8 @@
                 <td>
                     {% if oc.gravidade == 'N/A' %}
                         <span class="badge badge-na">—</span>
+                    {% elif oc.gravidade in ['Média', 'Media'] %}
+                        <span class="badge badge-media">Média</span>
                     {% else %}
                         <span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span>
                     {% endif %}
@@ -86,7 +119,7 @@
                 <td>{{ oc.descricao }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="5">Sem registos disciplinares para este aluno. Situação exemplar!</td></tr>
+            <tr><td colspan="5">Sem registos disciplinares. Comportamento exemplar!</td></tr>
             {% endfor %}
         </tbody>
     </table>

@@ -2,20 +2,21 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Caderneta Escolar v2.0</title>
+    <title>Caderneta Escolar v3.0</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
-        <h2>Caderneta Escolar Digital <small style="font-size: 0.8rem; background: #2563eb; padding: 2px 6px; border-radius: 4px;">v2.0</small></h2>
+        <h2>Caderneta Escolar Digital <small style="font-size: 0.8rem; background: #2563eb; padding: 2px 6px; border-radius: 4px;">v3.0</small></h2>
         <nav class="no-print">
             <a href="{{ url_for('index') }}">Início</a>
             <a href="{{ url_for('alunos') }}">Alunos</a>
             <a href="{{ url_for('professores') }}">Professores</a>
             <a href="{{ url_for('disciplinas') }}">Disciplinas</a>
             <a href="{{ url_for('notas') }}">Lançar Notas</a>
+            <a href="{{ url_for('frequencias') }}">Faltas / Presença</a>
             <a href="{{ url_for('ocorrencias') }}">Ocorrências</a>
-            <a href="{{ url_for('relatorio') }}">Boletim / Caderneta</a>
+            <a href="{{ url_for('relatorio') }}">Boletim Escolar</a>
         </nav>
     </header>
     <div class="container">

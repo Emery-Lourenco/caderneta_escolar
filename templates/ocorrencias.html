@@ -1,55 +1,82 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>Registar Ocorrência / Elogio</h3>
+    <h3>{{ 'Editar Registro' if editando else 'Registar Ocorrência / Elogio' }}</h3>
     <form method="POST">
-        <label>Aluno:</label>
-        <select name="aluno_id" required>
-            <option value="">Selecione um aluno...</option>
-            {% for a in alunos %}
-            <option value="{{ a.id }}">{{ a.nome }} ({{ a.turma }})</option>
-            {% endfor %}
-        </select>
-        
-        <label>Professor Relator:</label>
-        <select name="professor_id" required>
-            <option value="">Selecione o professor...</option>
-            {% for p in professores %}
-            <option value="{{ p.id }}">{{ p.nome }}</option>
-            {% endfor %}
-        </select>
+        {% if editando %}
+        <input type="hidden" name="id" value="{{ editando.id }}">
+        {% endif %}
 
-        <label>Data:</label>
-        <input type="date" name="data">
-
-        <label>Tipo:</label>
-        <select name="tipo" id="tipoSelect" onchange="verificarTipo()">
-            <option value="Disciplinar">Disciplinar</option>
-            <option value="Pedagógica">Pedagógica</option>
-            <option value="Elogio / Mérito">Elogio / Mérito</option>
-        </select>
-
-        <!-- Este campo oculta e desativa automaticamente quando selecionado Elogio -->
-        <div id="campoGravidade">
-            <label>Gravidade da Ocorrência:</label>
-            <select name="gravidade" id="gravidadeSelect">
-                <option value="Leve">Leve</option>
-                <option value="Média">Média</option>
-                <option value="Grave">Grave</option>
-            </select>
+        <div class="grid-2">
+            <div>
+                <label>Aluno:</label>
+                <select name="aluno_id" required>
+                    <option value="">Selecione um aluno...</option>
+                    {% for a in alunos %}
+                    <option value="{{ a.id }}" {% if editando and editando.aluno_id == a.id %}selected{% endif %}>
+                        {{ a.nome }} ({{ a.turma }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Professor Relator:</label>
+                <select name="professor_id" required>
+                    <option value="">Selecione o professor...</option>
+                    {% for p in professores %}
+                    <option value="{{ p.id }}" {% if editando and editando.professor_id == p.id %}selected{% endif %}>
+                        {{ p.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
 
-        <label>Descrição detalhada:</label>
-        <textarea name="descricao" rows="3" required></textarea>
+        <div class="grid-3">
+            <div>
+                <label>Data:</label>
+                <input type="date" name="data" value="{{ editando.data if editando else '' }}">
+            </div>
+            <div>
+                <label>Tipo:</label>
+                <select name="tipo" id="tipoSelect" onchange="verificarTipo()">
+                    <option value="Disciplinar" {% if editando and editando.tipo == 'Disciplinar' %}selected{% endif %}>Disciplinar</option>
+                    <option value="Pedagógica" {% if editando and editando.tipo == 'Pedagógica' %}selected{% endif %}>Pedagógica</option>
+                    <option value="Elogio / Mérito" {% if editando and editando.tipo == 'Elogio / Mérito' %}selected{% endif %}>Elogio / Mérito</option>
+                </select>
+            </div>
+            <div id="campoGravidade">
+                <label>Gravidade:</label>
+                <select name="gravidade" id="gravidadeSelect">
+                    <option value="Leve" {% if editando and editando.gravidade == 'Leve' %}selected{% endif %}>Leve</option>
+                    <option value="Média" {% if editando and editando.gravidade in ['Média', 'Media'] %}selected{% endif %}>Média</option>
+                    <option value="Grave" {% if editando and editando.gravidade == 'Grave' %}selected{% endif %}>Grave</option>
+                </select>
+            </div>
+        </div>
 
-        <button type="submit">Guardar Registro</button>
+        <label>Descrição:</label>
+        <textarea name="descricao" rows="3" required>{{ editando.descricao if editando else '' }}</textarea>
+
+        <button type="submit">{{ 'Atualizar Registro' if editando else 'Guardar Registro' }}</button>
+        {% if editando %}
+        <a href="{{ url_for('ocorrencias') }}" class="btn-cancel">Cancelar Edição</a>
+        {% endif %}
     </form>
 </div>
 
 <div class="card">
-    <h3>Histórico Escolar Registado</h3>
+    <h3>Histórico de Ocorrências e Elogios</h3>
     <table>
-        <tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Gravidade</th><th>Professor</th><th>Descrição</th></tr>
+        <tr>
+            <th>Data</th>
+            <th>Aluno</th>
+            <th>Tipo</th>
+            <th>Gravidade</th>
+            <th>Professor</th>
+            <th>Descrição</th>
+            <th class="no-print">Ações</th>
+        </tr>
         {% for oc in ocorrencias %}
         <tr>
             <td>{{ oc.data }}</td>
@@ -64,15 +91,21 @@
             <td>
                 {% if oc.gravidade == 'N/A' %}
                     <span class="badge badge-na">—</span>
+                {% elif oc.gravidade in ['Média', 'Media'] %}
+                    <span class="badge badge-media">Média</span>
                 {% else %}
                     <span class="badge badge-{{ oc.gravidade|lower }}">{{ oc.gravidade }}</span>
                 {% endif %}
             </td>
             <td>{{ oc.professor_nome }}</td>
             <td>{{ oc.descricao }}</td>
+            <td class="no-print">
+                <a href="{{ url_for('ocorrencias', editar_id=oc.id) }}" class="btn-action btn-edit">Editar</a>
+                <a href="{{ url_for('ocorrencias_eliminar', id=oc.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar ocorrência?')">Eliminar</a>
+            </td>
         </tr>
         {% else %}
-        <tr><td colspan="6">Nenhum registro encontrado.</td></tr>
+        <tr><td colspan="7">Nenhum registro encontrado.</td></tr>
         {% endfor %}
     </table>
 </div>
@@ -85,11 +118,12 @@ function verificarTipo() {
 
     if (tipo === 'Elogio / Mérito') {
         campoGravidade.classList.add('hidden');
-        selectGravidade.disabled = true; // Desativa para não enviar o valor
+        selectGravidade.disabled = true;
     } else {
         campoGravidade.classList.remove('hidden');
         selectGravidade.disabled = false;
     }
 }
+window.onload = verificarTipo;
 </script>
 {% endblock %}
