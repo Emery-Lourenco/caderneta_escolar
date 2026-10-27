@@ -17,15 +17,20 @@
 
 {% if aluno %}
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
         <div>
-            <h2>Boletim Escolar & Caderneta do Aluno</h2>
-            <p><strong>Nome:</strong> {{ aluno.nome }} | <strong>Matrícula:</strong> {{ aluno.matricula }} | <strong>Turma:</strong> {{ aluno.turma }}</p>
+            <h2 style="margin: 0 0 0.5rem 0;">Boletim Escolar & Caderneta do Aluno</h2>
+            <p style="margin: 0; color: #475569;">
+                <strong>Nome:</strong> {{ aluno.nome }} | <strong>Matrícula:</strong> {{ aluno.matricula }} | <strong>Turma:</strong> {{ aluno.turma }}
+            </p>
         </div>
-        <button class="no-print" style="width: auto; padding: 0.5rem 1.2rem;" onclick="window.print()">Imprimir Boletim</button>
+        <!-- Botão imprimir padronizado sem estilos inline quebrados -->
+        <button type="button" class="btn-primary no-print" onclick="window.print()" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            🖨️ Imprimir Boletim
+        </button>
     </div>
     
-    <hr>
+    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 1.5rem 0;">
 
     <!-- SECÇÃO 1: NOTAS -->
     <h3>1. Rendimento Pedagógico (Notas & Médias)</h3>
@@ -44,19 +49,19 @@
                 <td><span class="{{ 'status-aprovado' if n.situacao == 'Aprovado' else 'status-risco' }}">{{ n.situacao }}</span></td>
             </tr>
             {% else %}
-            <tr><td colspan="6">Nenhuma avaliação lançada.</td></tr>
+            <tr><td colspan="6">Nenhuma avaliação lançada até ao momento.</td></tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <hr style="margin-top: 2rem;">
+    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 2rem 0 1.5rem 0;">
 
     <!-- SECÇÃO 2: FALTAS -->
     <h3>2. Assiduidade & Frequência Escolar</h3>
     <p>
         Total de Faltas: <strong>{{ totais_faltas.Total }}</strong> | 
         Justificadas: <strong style="color: #2563eb;">{{ totais_faltas.Justificada }}</strong> | 
-        Injustificadas: <strong style="color: #dc2626;">{{ totais_faltas.Injustificada }}</strong>
+        Injustificadas: <strong style="color: #ef4444;">{{ totais_faltas.Injustificada }}</strong>
     </p>
     <table>
         <thead>
@@ -80,9 +85,9 @@
         </tbody>
     </table>
 
-    <hr style="margin-top: 2rem;">
+    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 2rem 0 1.5rem 0;">
 
-    <!-- SECÇÃO 3: OCORRÊNCIAS -->
+    <!-- SECÇÃO 3: CONDUTA -->
     <h3>3. Conduta, Disciplina & Elogios</h3>
     <p>
         ⭐ Elogios Recebidos: <strong style="color: #0284c7;">{{ totais.Elogios }}</strong> | 

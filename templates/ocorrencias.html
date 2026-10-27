@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>{{ 'Editar Registro' if editando else 'Registar Ocorrência / Elogio' }}</h3>
+    <h3>{{ 'Editar Ocorrência / Elogio' if editando else 'Registar Ocorrência / Elogio' }}</h3>
     <form method="POST">
         {% if editando %}
         <input type="hidden" name="id" value="{{ editando.id }}">
@@ -11,7 +11,7 @@
             <div>
                 <label>Aluno:</label>
                 <select name="aluno_id" required>
-                    <option value="">Selecione um aluno...</option>
+                    <option value="">Selecione o aluno...</option>
                     {% for a in alunos %}
                     <option value="{{ a.id }}" {% if editando and editando.aluno_id == a.id %}selected{% endif %}>
                         {{ a.nome }} ({{ a.turma }})
@@ -38,7 +38,7 @@
                 <input type="date" name="data" value="{{ editando.data if editando else '' }}">
             </div>
             <div>
-                <label>Tipo:</label>
+                <label>Tipo de Registo:</label>
                 <select name="tipo" id="tipoSelect" onchange="verificarTipo()">
                     <option value="Disciplinar" {% if editando and editando.tipo == 'Disciplinar' %}selected{% endif %}>Disciplinar</option>
                     <option value="Pedagógica" {% if editando and editando.tipo == 'Pedagógica' %}selected{% endif %}>Pedagógica</option>
@@ -55,18 +55,33 @@
             </div>
         </div>
 
-        <label>Descrição:</label>
-        <textarea name="descricao" rows="3" required>{{ editando.descricao if editando else '' }}</textarea>
+        <label>Descrição Detalhada do Fato:</label>
+        <textarea name="descricao" rows="3" required placeholder="Relate o ocorrido com clareza...">{{ editando.descricao if editando else '' }}</textarea>
 
-        <button type="submit">{{ 'Atualizar Registro' if editando else 'Guardar Registro' }}</button>
-        {% if editando %}
-        <a href="{{ url_for('ocorrencias') }}" class="btn-cancel">Cancelar Edição</a>
-        {% endif %}
+        <!-- Botões alinhados com o padrão do sistema -->
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">{{ 'Atualizar Registo' if editando else 'Guardar Registo' }}</button>
+            {% if editando %}
+            <a href="{{ url_for('ocorrencias') }}" class="btn-cancel">Cancelar Edição</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 
 <div class="card">
-    <h3>Histórico de Ocorrências e Elogios</h3>
+    <div class="table-header-bar">
+        <h3>Histórico Escolar de Conduta</h3>
+        <form method="GET" class="sort-box">
+            <label for="ordem">Ordenar por:</label>
+            <select name="ordem" id="ordem" onchange="this.form.submit()">
+                <option value="data_desc" {% if ordem_atual == 'data_desc' %}selected{% endif %}>Data (Mais Recente)</option>
+                <option value="data_asc" {% if ordem_atual == 'data_asc' %}selected{% endif %}>Data (Mais Antiga)</option>
+                <option value="aluno" {% if ordem_atual == 'aluno' %}selected{% endif %}>Aluno (A-Z)</option>
+                <option value="gravidade" {% if ordem_atual == 'gravidade' %}selected{% endif %}>Gravidade</option>
+                <option value="tipo" {% if ordem_atual == 'tipo' %}selected{% endif %}>Tipo</option>
+            </select>
+        </form>
+    </div>
     <table>
         <tr>
             <th>Data</th>
@@ -75,7 +90,7 @@
             <th>Gravidade</th>
             <th>Professor</th>
             <th>Descrição</th>
-            <th class="no-print">Ações</th>
+            <th class="no-print" style="width: 140px;">Ações</th>
         </tr>
         {% for oc in ocorrencias %}
         <tr>
@@ -100,12 +115,14 @@
             <td>{{ oc.professor_nome }}</td>
             <td>{{ oc.descricao }}</td>
             <td class="no-print">
-                <a href="{{ url_for('ocorrencias', editar_id=oc.id) }}" class="btn-action btn-edit">Editar</a>
-                <a href="{{ url_for('ocorrencias_eliminar', id=oc.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar ocorrência?')">Eliminar</a>
+                <div class="actions-cell">
+                    <a href="{{ url_for('ocorrencias', editar_id=oc.id) }}" class="btn-action btn-edit">Editar</a>
+                    <a href="{{ url_for('ocorrencias_eliminar', id=oc.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar ocorrência?')">Eliminar</a>
+                </div>
             </td>
         </tr>
         {% else %}
-        <tr><td colspan="7">Nenhum registro encontrado.</td></tr>
+        <tr><td colspan="7">Nenhum registo encontrado.</td></tr>
         {% endfor %}
     </table>
 </div>

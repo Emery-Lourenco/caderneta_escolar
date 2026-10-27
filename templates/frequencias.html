@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h3>{{ 'Editar Falta' if editando else 'Lançar Falta / Ausência' }}</h3>
+    <h3>{{ 'Editar Registo de Falta' if editando else 'Lançar Falta / Ausência' }}</h3>
     <form method="POST">
         {% if editando %}
         <input type="hidden" name="id" value="{{ editando.id }}">
@@ -47,17 +47,31 @@
         </div>
 
         <label>Justificativa / Observação:</label>
-        <input type="text" name="justificativa" value="{{ editando.justificativa if editando else '' }}" placeholder="Ex: Atestado médico, assunto familiar">
+        <input type="text" name="justificativa" value="{{ editando.justificativa if editando else '' }}" placeholder="Ex: Apresentou atestado médico, motivo familiar">
 
-        <button type="submit">{{ 'Atualizar Registro' if editando else 'Salvar Falta' }}</button>
-        {% if editando %}
-        <a href="{{ url_for('frequencias') }}" class="btn-cancel">Cancelar Edição</a>
-        {% endif %}
+        <!-- Botões padronizados com o restante do sistema -->
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">{{ 'Atualizar Registo' if editando else 'Salvar Falta' }}</button>
+            {% if editando %}
+            <a href="{{ url_for('frequencias') }}" class="btn-cancel">Cancelar Edição</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 
 <div class="card">
-    <h3>Histórico Geral de Faltas</h3>
+    <div class="table-header-bar">
+        <h3>Histórico Geral de Faltas</h3>
+        <form method="GET" class="sort-box">
+            <label for="ordem">Ordenar por:</label>
+            <select name="ordem" id="ordem" onchange="this.form.submit()">
+                <option value="data_desc" {% if ordem_atual == 'data_desc' %}selected{% endif %}>Data (Mais Recente)</option>
+                <option value="data_asc" {% if ordem_atual == 'data_asc' %}selected{% endif %}>Data (Mais Antiga)</option>
+                <option value="aluno" {% if ordem_atual == 'aluno' %}selected{% endif %}>Aluno (A-Z)</option>
+                <option value="tipo" {% if ordem_atual == 'tipo' %}selected{% endif %}>Tipo de Falta</option>
+            </select>
+        </form>
+    </div>
     <table>
         <tr>
             <th>Data</th>
@@ -65,7 +79,7 @@
             <th>Disciplina</th>
             <th>Tipo</th>
             <th>Justificativa</th>
-            <th class="no-print">Ações</th>
+            <th class="no-print" style="width: 140px;">Ações</th>
         </tr>
         {% for f in frequencias %}
         <tr>
@@ -79,8 +93,10 @@
             </td>
             <td>{{ f.justificativa or '—' }}</td>
             <td class="no-print">
-                <a href="{{ url_for('frequencias', editar_id=f.id) }}" class="btn-action btn-edit">Editar</a>
-                <a href="{{ url_for('frequencias_eliminar', id=f.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar registro de falta?')">Eliminar</a>
+                <div class="actions-cell">
+                    <a href="{{ url_for('frequencias', editar_id=f.id) }}" class="btn-action btn-edit">Editar</a>
+                    <a href="{{ url_for('frequencias_eliminar', id=f.id) }}" class="btn-action btn-delete" onclick="return confirm('Eliminar registo de falta?')">Eliminar</a>
+                </div>
             </td>
         </tr>
         {% else %}
