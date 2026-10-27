@@ -32,15 +32,30 @@
 
 <div class="card">
     <div class="table-header-bar">
-        <h3>Lista de Estudantes</h3>
-        <form method="GET" class="sort-box">
-            <label for="ordem">Ordenar por:</label>
-            <select name="ordem" id="ordem" onchange="this.form.submit()">
+        <h3>Lista de Estudantes ({{ alunos|length }})</h3>
+        
+        <!-- Barra Combinada de Busca e Filtro de Turma -->
+        <form method="GET" class="sort-box" style="flex-wrap: wrap;">
+            <input type="text" name="q" value="{{ busca_atual }}" placeholder="Buscar por nome ou matrícula..." style="width: 200px; padding: 0.35rem 0.6rem; margin: 0; font-size: 0.85rem;">
+            
+            <select name="turma" style="width: auto; padding: 0.35rem 0.6rem; margin: 0; font-size: 0.85rem;">
+                <option value="">Todas as Turmas</option>
+                {% for t in turmas %}
+                <option value="{{ t }}" {% if turma_atual == t %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="ordem" onchange="this.form.submit()">
                 <option value="nome_asc" {% if ordem_atual == 'nome_asc' %}selected{% endif %}>Nome (A-Z)</option>
                 <option value="nome_desc" {% if ordem_atual == 'nome_desc' %}selected{% endif %}>Nome (Z-A)</option>
                 <option value="turma" {% if ordem_atual == 'turma' %}selected{% endif %}>Turma</option>
                 <option value="matricula" {% if ordem_atual == 'matricula' %}selected{% endif %}>Nº Matrícula</option>
             </select>
+
+            <button type="submit" class="btn-primary" style="min-width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem; margin: 0;">Filtrar</button>
+            {% if busca_atual or turma_atual %}
+            <a href="{{ url_for('alunos') }}" class="btn-cancel" style="padding: 0.35rem 0.6rem; font-size: 0.85rem; margin: 0;">Limpar</a>
+            {% endif %}
         </form>
     </div>
     <table>
@@ -56,7 +71,7 @@
             <td>{{ a.id }}</td>
             <td>{{ a.nome }}</td>
             <td>{{ a.matricula }}</td>
-            <td>{{ a.turma }}</td>
+            <td><strong>{{ a.turma }}</strong></td>
             <td class="no-print">
                 <div class="actions-cell">
                     <a href="{{ url_for('alunos', editar_id=a.id) }}" class="btn-action btn-edit">Editar</a>
@@ -65,7 +80,7 @@
             </td>
         </tr>
         {% else %}
-        <tr><td colspan="5">Nenhum aluno registado.</td></tr>
+        <tr><td colspan="5">Nenhum aluno encontrado para os critérios pesquisados.</td></tr>
         {% endfor %}
     </table>
 </div>

@@ -1,9 +1,12 @@
+import io
+import csv
 import json
 import os
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file, Response, flash
 
 app = Flask(__name__)
+app.secret_key = 'caderneta_escolar_super_secret_key'
 DB_FILE = os.path.join(os.path.dirname(__file__), 'data', 'database.json')
 
 def carregar_dados():
@@ -18,12 +21,8 @@ def carregar_dados():
         }
     with open(DB_FILE, 'r', encoding='utf-8') as f:
         dados = json.load(f)
-        dados.setdefault("alunos", [])
-        dados.setdefault("professores", [])
-        dados.setdefault("disciplinas", [])
-        dados.setdefault("notas", [])
-        dados.setdefault("ocorrencias", [])
-        dados.setdefault("frequencias", [])
+        for chave in ["alunos", "professores", "disciplinas", "notas", "ocorrencias", "frequencias"]:
+            dados.setdefault(chave, [])
         return dados
 
 def salvar_dados(dados):
@@ -36,23 +35,110 @@ def gerar_novo_id(lista):
     return max(item['id'] for item in lista) + 1
 
 # ==========================================
-# DASHBOARD
+# DASHBOARD ANALÍTICO & GESTÃO DE BACKUP
 # ==========================================
 @app.route('/')
 def index():
     db = carregar_dados()
+    
+    # Métricas de Conduta
+    elogios = len([o for o in db["ocorrencias"] if o.get('tipo') == 'Elogio / Mérito'])
+    leves = len([o for o in db["ocorrencias"] if o.get('gravidade') == 'Leve'])
+    medias = len([o for o in db["ocorrencias"] if o.get('gravidade') in ['Média', 'Media']])
+    graves = len([o for o in db["ocorrencias"] if o.get('gravidade') == 'Grave'])
+    
+    # Métricas de Rendimento
+    aprovados = len([n for n in db["notas"] if n.get('situacao') == 'Aprovado'])
+    em_risco = len([n for n in db["notas"] if n.get('situacao') == 'Em Risco'])
+    
+    # Métricas de Frequência
+    faltas_just = len([f for f in db["frequencias"] if f.get('tipo') == 'Justificada'])
+    faltas_injust = len([f for f in db["frequencias"] if f.get('tipo') == 'Injustificada'])
+
     resumo = {
         "total_alunos": len(db["alunos"]),
         "total_professores": len(db["professores"]),
         "total_disciplinas": len(db["disciplinas"]),
-        "total_ocorrencias": len([o for o in db["ocorrencias"] if o.get('tipo') != 'Elogio / Mérito']),
-        "total_elogios": len([o for o in db["ocorrencias"] if o.get('tipo') == 'Elogio / Mérito']),
+        "total_notas": len(db["notas"]),
+        "total_ocorrencias": leves + medias + graves,
+        "total_elogios": elogios,
         "total_faltas": len(db["frequencias"])
     }
-    return render_template('index.html', resumo=resumo)
+
+    dados_graficos = {
+        "conduta": [elogios, leves, medias, graves],
+        "rendimento": [aprovados, em_risco],
+        "faltas": [faltas_just, faltas_injust]
+    }
+
+    return render_template('index.html', resumo=resumo, graficos=dados_graficos)
+
+@app.route('/backup/download')
+def backup_download():
+    """Descarrega o ficheiro JSON como cópia de segurança."""
+    nome_ficheiro = f"backup_caderneta_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    return send_file(DB_FILE, as_attachment=True, download_name=nome_ficheiro, mimetype='application/json')
+
+@app.route('/backup/restaurar', methods=['POST'])
+def backup_restaurar():
+    """Restaura a base de dados a partir de um ficheiro JSON submetido."""
+    ficheiro = request.files.get('backup_file')
+    if not ficheiro or ficheiro.filename == '':
+        flash('Nenhum ficheiro selecionado.', 'erro')
+        return redirect(url_for('index'))
+    
+    try:
+        conteudo = json.load(ficheiro)
+        chaves_obrigatorias = ["alunos", "professores", "disciplinas", "notas", "ocorrencias", "frequencias"]
+        if not all(chave in conteudo for chave in chaves_obrigatorias):
+            flash('Ficheiro de backup inválido: faltam entidades estruturais.', 'erro')
+            return redirect(url_for('index'))
+        
+        salvar_dados(conteudo)
+        flash('Base de dados restaurada com sucesso!', 'sucesso')
+    except Exception as e:
+        flash(f'Erro ao ler o ficheiro de backup: {str(e)}', 'erro')
+
+    return redirect(url_for('index'))
 
 # ==========================================
-# CRUD & ORDENAÇÃO: ALUNOS
+# EXPORTAÇÃO CSV PARA EXCEL
+# ==========================================
+@app.route('/exportar/notas')
+def exportar_notas_csv():
+    """Exporta a pauta completa de notas para CSV compatível com Excel."""
+    db = carregar_dados()
+    alunos_map = {a['id']: a for a in db['alunos']}
+    disciplinas_map = {d['id']: d['nome'] for d in db['disciplinas']}
+
+    output = io.StringIO()
+    # UTF-8 BOM para garantir exibição correta de caracteres especiais no Microsoft Excel
+    output.write('\ufeff')
+    writer = csv.writer(output, delimiter=';')
+
+    writer.writerow(['Matrícula', 'Aluno', 'Turma', 'Disciplina', 'Período', 'Nota 1', 'Nota 2', 'Média', 'Situação'])
+    for n in db['notas']:
+        aluno = alunos_map.get(n['aluno_id'], {})
+        writer.writerow([
+            aluno.get('matricula', '—'),
+            aluno.get('nome', 'Desconhecido'),
+            aluno.get('turma', '—'),
+            disciplinas_map.get(n['disciplina_id'], '—'),
+            n.get('trimestre', '—'),
+            n.get('nota1', 0),
+            n.get('nota2', 0),
+            n.get('media', 0),
+            n.get('situacao', '—')
+        ])
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=pauta_notas_escolar.csv"}
+    )
+
+# ==========================================
+# ALUNOS (Com Pesquisa Textual e Filtro por Turma)
 # ==========================================
 @app.route('/alunos', methods=['GET', 'POST'])
 def alunos():
@@ -82,9 +168,19 @@ def alunos():
         salvar_dados(db)
         return redirect(url_for('alunos'))
 
-    # Ordenação
+    # Filtros e Pesquisa
+    busca = request.args.get('q', '').strip().lower()
+    filtro_turma = request.args.get('turma', '').strip()
     ordem = request.args.get('ordem', 'nome_asc')
+
+    turmas_disponiveis = sorted(list({a['turma'] for a in db['alunos'] if a.get('turma')}))
+
     lista = list(db["alunos"])
+    if busca:
+        lista = [a for a in lista if busca in a['nome'].lower() or busca in a['matricula'].lower()]
+    if filtro_turma:
+        lista = [a for a in lista if a['turma'] == filtro_turma]
+
     if ordem == 'nome_asc':
         lista.sort(key=lambda x: x['nome'].lower())
     elif ordem == 'nome_desc':
@@ -94,7 +190,13 @@ def alunos():
     elif ordem == 'matricula':
         lista.sort(key=lambda x: x['matricula'].lower())
 
-    return render_template('alunos.html', alunos=lista, editando=aluno_editando, ordem_atual=ordem)
+    return render_template('alunos.html', 
+                           alunos=lista, 
+                           editando=aluno_editando, 
+                           ordem_atual=ordem, 
+                           turmas=turmas_disponiveis,
+                           busca_atual=busca,
+                           turma_atual=filtro_turma)
 
 @app.route('/alunos/eliminar/<int:id>')
 def alunos_eliminar(id):
@@ -104,7 +206,7 @@ def alunos_eliminar(id):
     return redirect(url_for('alunos'))
 
 # ==========================================
-# CRUD & ORDENAÇÃO: PROFESSORES
+# PROFESSORES
 # ==========================================
 @app.route('/professores', methods=['GET', 'POST'])
 def professores():
@@ -132,7 +234,6 @@ def professores():
         salvar_dados(db)
         return redirect(url_for('professores'))
 
-    # Ordenação
     ordem = request.args.get('ordem', 'nome_asc')
     lista = list(db["professores"])
     if ordem == 'nome_asc':
@@ -152,7 +253,7 @@ def professores_eliminar(id):
     return redirect(url_for('professores'))
 
 # ==========================================
-# CRUD & ORDENAÇÃO: DISCIPLINAS
+# DISCIPLINAS
 # ==========================================
 @app.route('/disciplinas', methods=['GET', 'POST'])
 def disciplinas():
@@ -186,7 +287,6 @@ def disciplinas():
         for d in db["disciplinas"]
     ]
 
-    # Ordenação
     ordem = request.args.get('ordem', 'nome_asc')
     if ordem == 'nome_asc':
         lista.sort(key=lambda x: x['nome'].lower())
@@ -205,7 +305,7 @@ def disciplinas_eliminar(id):
     return redirect(url_for('disciplinas'))
 
 # ==========================================
-# CRUD & ORDENAÇÃO: NOTAS
+# NOTAS (Com Filtro por Turma e Disciplina)
 # ==========================================
 @app.route('/notas', methods=['GET', 'POST'])
 def notas():
@@ -259,19 +359,23 @@ def notas():
         salvar_dados(db)
         return redirect(url_for('notas'))
 
-    alunos_map = {a['id']: a['nome'] for a in db['alunos']}
+    alunos_map = {a['id']: a for a in db['alunos']}
     disciplinas_map = {d['id']: d['nome'] for d in db['disciplinas']}
 
     lista = [
         {
             **n,
-            "aluno_nome": alunos_map.get(n['aluno_id'], 'Desconhecido'),
+            "aluno_nome": alunos_map.get(n['aluno_id'], {}).get('nome', 'Desconhecido'),
+            "aluno_turma": alunos_map.get(n['aluno_id'], {}).get('turma', '—'),
             "disciplina_nome": disciplinas_map.get(n['disciplina_id'], 'Desconhecida')
         }
         for n in db["notas"]
     ]
 
-    # Ordenação
+    filtro_turma = request.args.get('turma', '').strip()
+    if filtro_turma:
+        lista = [n for n in lista if n['aluno_turma'] == filtro_turma]
+
     ordem = request.args.get('ordem', 'aluno')
     if ordem == 'aluno':
         lista.sort(key=lambda x: x['aluno_nome'].lower())
@@ -284,10 +388,14 @@ def notas():
     elif ordem == 'trimestre':
         lista.sort(key=lambda x: x['trimestre'])
 
+    turmas_disponiveis = sorted(list({a['turma'] for a in db['alunos'] if a.get('turma')}))
+
     return render_template('notas.html', 
                            notas=lista, 
                            alunos=db['alunos'], 
                            disciplinas=db['disciplinas'],
+                           turmas=turmas_disponiveis,
+                           turma_atual=filtro_turma,
                            editando=nota_editando,
                            ordem_atual=ordem)
 
@@ -299,7 +407,7 @@ def notas_eliminar(id):
     return redirect(url_for('notas'))
 
 # ==========================================
-# CRUD & ORDENAÇÃO: OCORRÊNCIAS
+# OCORRÊNCIAS
 # ==========================================
 @app.route('/ocorrencias', methods=['GET', 'POST'])
 def ocorrencias():
@@ -357,7 +465,6 @@ def ocorrencias():
         for oc in db['ocorrencias']
     ]
 
-    # Ordenação
     ordem = request.args.get('ordem', 'data_desc')
     grav_peso = {'Grave': 3, 'Média': 2, 'Media': 2, 'Leve': 1, 'N/A': 0}
     if ordem == 'data_desc':
@@ -386,7 +493,7 @@ def ocorrencias_eliminar(id):
     return redirect(url_for('ocorrencias'))
 
 # ==========================================
-# CRUD & ORDENAÇÃO: FREQUÊNCIAS
+# FREQUÊNCIAS
 # ==========================================
 @app.route('/frequencias', methods=['GET', 'POST'])
 def frequencias():
@@ -438,7 +545,6 @@ def frequencias():
         for f in db["frequencias"]
     ]
 
-    # Ordenação
     ordem = request.args.get('ordem', 'data_desc')
     if ordem == 'data_desc':
         lista.sort(key=lambda x: x['data'], reverse=True)

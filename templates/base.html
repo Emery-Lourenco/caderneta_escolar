@@ -2,14 +2,14 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Caderneta Escolar Digital v4.1</title>
+    <title>Caderneta Escolar Digital v5.0</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
         <div class="header-container">
             <h2 class="header-title">
-                Caderneta Escolar <span class="header-badge">v4.1</span>
+                Caderneta Escolar <span class="header-badge">v5.0</span>
             </h2>
             <nav class="no-print">
                 <a href="{{ url_for('index') }}" class="nav-link {{ 'active' if request.endpoint == 'index' else '' }}">Início</a>

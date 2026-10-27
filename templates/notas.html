@@ -51,7 +51,6 @@
         </div>
 
         <div class="form-actions">
-            <!-- Pedido atendido: texto exato "Salvar Avaliação" -->
             <button type="submit" class="btn-primary">Salvar Avaliação</button>
             {% if editando %}
             <a href="{{ url_for('notas') }}" class="btn-cancel">Cancelar Edição</a>
@@ -62,10 +61,22 @@
 
 <div class="card">
     <div class="table-header-bar">
-        <h3>Pauta Geral de Avaliações</h3>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <h3>Pauta Geral de Avaliações</h3>
+            <a href="{{ url_for('exportar_notas_csv') }}" class="btn-action" style="background: #16a34a; color: #fff; padding: 0.35rem 0.65rem;" title="Descarregar pauta em formato Excel/CSV">
+                📊 Exportar Excel (CSV)
+            </a>
+        </div>
+        
         <form method="GET" class="sort-box">
-            <label for="ordem">Ordenar por:</label>
-            <select name="ordem" id="ordem" onchange="this.form.submit()">
+            <select name="turma" onchange="this.form.submit()">
+                <option value="">Todas as Turmas</option>
+                {% for t in turmas %}
+                <option value="{{ t }}" {% if turma_atual == t %}selected{% endif %}>Turma: {{ t }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="ordem" onchange="this.form.submit()">
                 <option value="aluno" {% if ordem_atual == 'aluno' %}selected{% endif %}>Aluno (A-Z)</option>
                 <option value="disciplina" {% if ordem_atual == 'disciplina' %}selected{% endif %}>Disciplina</option>
                 <option value="media_desc" {% if ordem_atual == 'media_desc' %}selected{% endif %}>Maior Média</option>
@@ -77,6 +88,7 @@
     <table>
         <tr>
             <th>Aluno</th>
+            <th>Turma</th>
             <th>Disciplina</th>
             <th>Período</th>
             <th>Nota 1</th>
@@ -88,6 +100,7 @@
         {% for n in notas %}
         <tr>
             <td>{{ n.aluno_nome }}</td>
+            <td><small>{{ n.aluno_turma }}</small></td>
             <td>{{ n.disciplina_nome }}</td>
             <td>{{ n.trimestre }}</td>
             <td>{{ n.nota1 }}</td>
@@ -106,7 +119,7 @@
             </td>
         </tr>
         {% else %}
-        <tr><td colspan="8">Nenhuma avaliação registada.</td></tr>
+        <tr><td colspan="9">Nenhuma avaliação registada.</td></tr>
         {% endfor %}
     </table>
 </div>

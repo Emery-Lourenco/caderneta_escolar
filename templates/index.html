@@ -1,14 +1,138 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card">
-    <h3>Painel Geral da Instituição</h3>
-    <p>Resumo operacional da Caderneta Escolar:</p>
-    <ul>
-        <li><strong>Alunos Registados:</strong> {{ resumo.total_alunos }}</li>
-        <li><strong>Corpo Docente:</strong> {{ resumo.total_professores }}</li>
-        <li><strong>Disciplinas Curriculares:</strong> {{ resumo.total_disciplinas }}</li>
-        <li><strong>Ocorrências Disciplinares/Pedagógicas:</strong> {{ resumo.total_ocorrencias }}</li>
-        <li><strong>Elogios / Méritos Concedidos:</strong> <span style="color: #0284c7; font-weight: bold;">{{ resumo.total_elogios }}</span></li>
-    </ul>
+
+<!-- Mensagens de Notificação de Backup -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div style="padding: 0.85rem 1.25rem; margin-bottom: 1.5rem; border-radius: 6px; font-weight: 600; 
+                  background: {{ '#dcfce7' if category == 'sucesso' else '#fee2e2' }}; 
+                  color: {{ '#166534' if category == 'sucesso' else '#991b1b' }}; 
+                  border: 1px solid {{ '#bbf7d0' if category == 'sucesso' else '#fecaca' }};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Cartões de Indicadores Gerais -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="card" style="margin: 0; text-align: center; border-left: 4px solid #2563eb;">
+        <span style="font-size: 0.85rem; color: #64748b; font-weight: bold; text-transform: uppercase;">Alunos</span>
+        <h2 style="margin: 0.5rem 0 0 0; font-size: 2rem; color: #1e293b;">{{ resumo.total_alunos }}</h2>
+    </div>
+    <div class="card" style="margin: 0; text-align: center; border-left: 4px solid #0284c7;">
+        <span style="font-size: 0.85rem; color: #64748b; font-weight: bold; text-transform: uppercase;">Professores</span>
+        <h2 style="margin: 0.5rem 0 0 0; font-size: 2rem; color: #1e293b;">{{ resumo.total_professores }}</h2>
+    </div>
+    <div class="card" style="margin: 0; text-align: center; border-left: 4px solid #10b981;">
+        <span style="font-size: 0.85rem; color: #64748b; font-weight: bold; text-transform: uppercase;">Elogios</span>
+        <h2 style="margin: 0.5rem 0 0 0; font-size: 2rem; color: #0284c7;">⭐ {{ resumo.total_elogios }}</h2>
+    </div>
+    <div class="card" style="margin: 0; text-align: center; border-left: 4px solid #f59e0b;">
+        <span style="font-size: 0.85rem; color: #64748b; font-weight: bold; text-transform: uppercase;">Ocorrências</span>
+        <h2 style="margin: 0.5rem 0 0 0; font-size: 2rem; color: #ef4444;">{{ resumo.total_ocorrencias }}</h2>
+    </div>
+    <div class="card" style="margin: 0; text-align: center; border-left: 4px solid #8b5cf6;">
+        <span style="font-size: 0.85rem; color: #64748b; font-weight: bold; text-transform: uppercase;">Total Faltas</span>
+        <h2 style="margin: 0.5rem 0 0 0; font-size: 2rem; color: #1e293b;">{{ resumo.total_faltas }}</h2>
+    </div>
 </div>
+
+<!-- Gráficos Analíticos com Chart.js -->
+<div class="grid-2">
+    <div class="card">
+        <h3>Panorama Disciplinar & Reconhecimento</h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: -0.5rem;">Proporção de elogios vs. infrações por gravidade</p>
+        <div style="max-height: 280px; display: flex; justify-content: center;">
+            <canvas id="chartConduta"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Rendimento Acadêmico & Assiduidade</h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: -0.5rem;">Aprovações em avaliações e perfil de faltas</p>
+        <div style="max-height: 280px; display: flex; justify-content: center;">
+            <canvas id="chartRendimento"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Central de Segurança: Backup & Restauração -->
+<div class="card">
+    <h3>Central de Segurança da Base de Dados</h3>
+    <p style="color: #64748b; font-size: 0.9rem;">
+        Exporte ou recupere todas as informações da instituição (alunos, notas, faltas e ocorrências) a qualquer momento.
+    </p>
+    <div class="grid-2" style="align-items: center; margin-top: 1rem;">
+        <div>
+            <label>Descarregar Cópia de Segurança Completa:</label>
+            <a href="{{ url_for('backup_download') }}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.65rem 1.25rem;">
+                📥 Fazer Download do Backup (JSON)
+            </a>
+        </div>
+        <div>
+            <form action="{{ url_for('backup_restaurar') }}" method="POST" enctype="multipart/form-data">
+                <label>Restaurar Cópia Existente:</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="file" name="backup_file" accept=".json" required style="margin: 0;">
+                    <button type="submit" class="btn-primary" style="min-width: 120px; margin: 0; background: #0f172a;" onclick="return confirm('ATENÇÃO: A restauração substituirá os dados atuais. Deseja prosseguir?')">
+                        Restaurar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // 1. Gráfico de Rosca: Conduta
+    const dadosConduta = {{ graficos.conduta | tojson }};
+    new Chart(document.getElementById('chartConduta'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Elogios', 'Leves', 'Médias', 'Graves'],
+            datasets: [{
+                data: dadosConduta,
+                backgroundColor: ['#0284c7', '#10b981', '#f59e0b', '#ef4444'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // 2. Gráfico de Barras: Rendimento e Faltas
+    const dadosRendimento = {{ graficos.rendimento | tojson }};
+    const dadosFaltas = {{ graficos.faltas | tojson }};
+    new Chart(document.getElementById('chartRendimento'), {
+        type: 'bar',
+        data: {
+            labels: ['Aprovados', 'Em Risco', 'Faltas Just.', 'Faltas Injust.'],
+            datasets: [{
+                label: 'Ocorrências / Registos',
+                data: [dadosRendimento[0], dadosRendimento[1], dadosFaltas[0], dadosFaltas[1]],
+                backgroundColor: ['#16a34a', '#dc2626', '#3b82f6', '#ef4444'],
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+</script>
 {% endblock %}
